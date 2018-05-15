@@ -5,12 +5,12 @@
 		<title>模拟操作系统</title>
 	</head>
 	<body>
-		<div class = ""></div>
+		<div class = "" id = "app">
 		<div class = "main-contain">
 			<div class = "query newquery">
 				创建进程队列
-				<div class = "newprocess"></div>
-				<div class = "newprocess"></div>
+				<!-- <div class = "newprocess"></div> -->
+				<!-- <div class = "newprocess"></div> -->
 			</div>
 			<div class = "query readyquery">
 				就绪进程队列
@@ -81,18 +81,32 @@
 			</select>
 			<button class="createprocess button" onclick="createnewprocess()">创建</button>
 		</div>
+	</div>
 	</body>
 </html>
+<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/pageinteraction.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/createnewprocess.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-
+	//定时执行函数
+	window.onload = function(){
+		setInterval(run(), 3000);
+	}
+	var app = new Vue({
+		el: '#app',
+		data: {
+			message: '页面加载于 ' + new Date().toLocaleString()
+		}
+	})
 </script>
 <style>
 	.query{
 		/*display: inline-block;*/
+	}
+	.newquery{
+		height: 100px;
 	}
 	.newquery > .newprocess{
 		display: inline-block;

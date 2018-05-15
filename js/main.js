@@ -17,8 +17,11 @@ var nowreadylevel3 = 0
 var nowreadylevel4 = 0
 var nownewquery = 0
 var nowblockquery = 0
+//当前进程的总共的pid
+var pid = 0
 function pcb(priority,runtime,isblock,blocktime,blocklasttime){
 	let o ={
+		id: pid, 
 		size:10,
 		isblock:isblock,
 		blocktime:blocktime,
@@ -57,12 +60,16 @@ function init(){
 }
 function createprocess(priority,runtime,isblock,blocktime,blocklasttime){
 	console.log("create")
-	if(nownewquery<newquerysize){
+	if(newquery.length<newquerysize){
 		let newpcb = pcb(priority,runtime,isblock,blocktime,blocklasttime)
 		newquery.push(newpcb)
+		let newquerydiv = "<div class = 'newprocess'>"+ pid.toString() +"</div>"
+		$(".newquery").append(newquerydiv)
+		console.log(newquery.length)
+		pid = pid + 1
 	}
 	else{
-		alert("创建失败")
+		alert("队列已满，请等待")
 	}
 }
 function run(){
