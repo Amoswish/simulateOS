@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>模拟操作系统</title>
+	</head>
+	<body>
+		<div class = ""></div>
+		<div class = "main-contain">
+			<div class = "query newquery">
+				创建进程队列
+				<div class = "newprocess"></div>
+				<div class = "newprocess"></div>
+			</div>
+			<div class = "query readyquery">
+				就绪进程队列
+				<div class = "readylevelquery readyquerylevel1">
+					优先级1
+					<div class="readyprocess"></div>
+					<div class="readyprocess"></div>
+				</div>
+				<div class = "readylevelquery readyquerylevel2">
+					优先级2
+					<div class="readyprocess"></div>
+					<div class="readyprocess"></div>
+				</div>
+				<div class = "readylevelquery readyquerylevel3">
+					优先级3
+					<div class="readyprocess"></div>
+					<div class="readyprocess"></div>
+				</div>
+				<div class = "readylevelquery readyquerylevel4">
+					优先级4
+					<div class="readyprocess"></div>
+					<div class="readyprocess"></div>
+				</div>
+				<!--<div class="readyprocess"></div>-->
+				<!--<div class="readyprocess"></div>-->
+			</div>
+			<div class = "query runquery">
+				运行进程队列
+				<div class="runprocess"></div>
+				<div class="runprocess"></div>
+			</div>
+			<div class = "query blockquery">
+				阻塞进程队列
+				<div class="blockprocess"></div>
+				<div class="blockprocess"></div>
+			</div>
+		</div>
+		<div class = "createprocess">
+			创建一个进程：：：优先级
+			<select name="createpriority">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+			</select>
+			runtime
+			<select name="runtime">
+				<option value="1000">1000</option>
+				<option value="2000">2000</option>
+				<option value="3000">3000</option>
+			</select>
+			isblock
+			<select name="createisblock">
+				<option value="false">否</option>
+				<option value="true">是</option>
+			</select>
+			blocktime
+			<select name="blocktime" style="display: none;">
+				<option value="1000">1000</option>
+				<option value="2000">2000</option>
+				<option value="3000">3000</option>
+			</select>
+			blocklasttime
+			<select name="blocklasttime" style="display: none;">
+				<option value="1000">1000</option>
+				<option value="2000">2000</option>
+				<option value="3000">3000</option>
+			</select>
+			<button class="createprocess button" onclick="createnewprocess()">创建</button>
+		</div>
+	</body>
+</html>
+<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/pageinteraction.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/createnewprocess.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+
+</script>
+<style>
+	.query{
+		/*display: inline-block;*/
+	}
+	.newquery > .newprocess{
+		display: inline-block;
+		width: 100px;
+		height: 100px;
+		border:dotted;
+	}
+	.readyquery > .readylevelquery >.readyprocess{
+		display: inline-block;
+		width: 100px;
+		height: 100px;
+		border:dotted;
+	}
+	.runquery > .runprocess{
+		display: inline-block;
+		width: 100px;
+		height: 100px;
+		border:dotted;
+	}
+	.blockquery > .blockprocess{
+		display: inline-block;
+		width: 100px;
+		height: 100px;
+		border:dotted;
+	}
+</style>
