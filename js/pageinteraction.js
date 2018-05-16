@@ -1,4 +1,6 @@
+$(document).ready(function(){
 $("[name='createisblock']").change(function (){
+	console.log($(this).val())
 	if($(this).val() == "false"){
 		$("[name='blocktime']").css("display","none")
 		$("[name='blocklasttime']").css("display","none")
@@ -8,4 +10,5 @@ $("[name='createisblock']").change(function (){
 		$("[name='blocklasttime']").css("display","")
 	}
 	console.log($(this).val())
+})
 })
