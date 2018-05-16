@@ -1,22 +1,24 @@
 const memory = 10000
-const timeslice = 100
+const timeslice = 1000
 const readylevel = 4//一共多少个优先级
 const readyquerysize = 4
 const everyreadyquerysize =4
 const newquerysize = 4
 const blockquerysize = 4
+const runquerysize = 1
 //init后
-var readyquery = []
+let b = []
 //创建二维readyquery数组
 // var ab = []
 for(let i = 0;i<readylevel;i++){
-	var a = []
-	readyquery.push(a)
+	let a = []
+	b.push(a)
 }
-
+const readyquery = [[],[],[],[]]
 const runquery = []//单核
 const blockquery = []
 const newquery = []
+const exitquery = []
 //动态判断运行的变量
 var nowreadylevel1 = 0
 var nowreadylevel2 = 0
@@ -70,9 +72,9 @@ function createprocess(priority,runtime,isblock,blocktime,blocklasttime){
 	if(newquery.length<newquerysize){
 		let newpcb = pcb(priority,runtime,isblock,blocktime,blocklasttime)
 		newquery.push(newpcb)
-		let newquerydiv = "<div class = 'newprocess'" + "name='" + newpcb.id.toString +"' >"+ newpcb.id.toString() +"  state  "+newpcb.state.toString()+"</div>"
-		$(".newquery").append(newquerydiv)
-		console.log(newquery.length)
+		creatediv("newquery","newprocess",newpcb)
+		// let newquerydiv = "<div class = 'newprocess'" + "name='" + newpcb.id.toString +"' >"+ newpcb.id.toString() +"  state  "+newpcb.state.toString()+"</div>"
+		// $(".newquery").append(newquerydiv)
 		pid = pid + 1
 	}
 	else{
@@ -82,74 +84,163 @@ function createprocess(priority,runtime,isblock,blocktime,blocklasttime){
 function run(){
 	//将阻塞队列进行处理
 	if(blockquery.length>0){
-		for (blockprocess in blockquery){
-			blockprocess.blocktime = blockprocess.blocktime - timeslice
-			if(blockprocess.blocktime <= 0){
+		for (let j = 0;j<blockquery.length;j++){
+			blockprocess  = blockquery[j]
+			blockprocess.blocklasttime = blockprocess.blocklasttime - timeslice
+			if(blockprocess.blocklasttime <= 0){
+				//阻塞完成
 				for(let i = blockprocess.priority;i>0;i--){
 					if(i == 1){
-							if(readyquery[1].length >= readyquerysize){
-								//应该加入阻塞队列，但这里直接非正常exit
-								alert("内存不够大，非正常exit")
-							}
-						break
+						if(readyquery[0].length >= readyquerysize){
+							//应该加入阻塞队列，但这里直接非正常exit
+							alert("内存不够大，非正常exit")
+							blockquery.pop()
+							blockprocess.state = "exit"
+							exitquery.push(blockprocess)
+							deletediv(blockprocess)
+							creatediv("exitquery","exitprocess",blockprocess)
+						}
+						else {
+							blockquery.pop()
+							blockprocess.state="ready"
+							blockprocess.isblock = "false"
+							readyquery[0].push(blockprocess)
+							deletediv(blockprocess)
+							createreadeydiv("readyquerylevel","readyprocess",blockprocess)
+							break
+						}
 					}
-					if(readyquery[i-1].length<readyquerysize){
-						readyquery[i-1].push(blockprocess)
+					else if(readyquery[i-2].length<readyquerysize){
+						blockquery.pop()
+						blockprocess.state="ready"
+						blockprocess.isblock = "false"
+						readyquery[i-2].push(blockprocess)
+						deletediv(blockprocess)
+						createreadeydiv("readyquerylevel","readyprocess",blockprocess)
 					}
 				}
 			}
 		}
+	}
 	//判断runquery
-	if(runquery.length==1){
+	console.log(runquery);
+	
+	if(runquery.length <= runquerysize && runquery.length > 0){
 		let nowprocess = runquery.pop()
 		nowprocess.runtime = nowprocess.runtime - timeslice
 		nowprocess.blocktime = nowprocess.blocktime - timeslice
-		if(nowprocess.blocktime <=0){
+		if(nowprocess.blocktime <=0 && nowprocess.isblock == "true"){
 			if(blockquery.length<blockquerysize){
+				nowprocess.state = "block"
 				blockquery.push(nowprocess)
+				deletediv(nowprocess)
+				creatediv("blockquery","blockprocess",nowprocess)
 			}
 			else{
 				alert("内存不够大，非正常exit")
+				nowprocess.state = "exit"
+				exitquery.push(nowprocess)
+				deletediv(nowprocess)
+				creatediv("exitquery","exitprocess",nowprocess)
 			}
 		}
-		for(let i = nowprocess.priority;i>0;i--){
-			if(i == 1){
-				if(readyquery[1].length >= readyquerysize){
-					//应该加入阻塞队列，但这里直接非正常exit
-					alert("内存不够大，非正常exit")
-				}
-				break
+		else{
+			if(nowprocess.runtime<=0){
+				//运行结束
+				nowprocess.state = "exit"
+				exitquery.push(nowprocess)
+				deletediv(nowprocess)
+				creatediv("exitquery","exitprocess",nowprocess)
 			}
-			if(readyquery[i-1].length<readyquerysize){
-				readyquery[i-1].push(nowprocess)
+			else{
+					//时间片轮转结束，回到就绪队列
+					for(let i = nowprocess.priority;i>0;i--){
+						if(i == 1){
+							if(readyquery[0].length >= readyquerysize){
+								//应该加入阻塞队列，但这里直接非正常exit
+								alert("内存不够大，非正常exit")
+								nowprocess.state = "exit"
+								exitquery.push(nowprocess)
+								deletediv(nowprocess)
+								creatediv("exitquery","exitprocess",nowprocess)
+							}
+							else{
+								readyquery[0].push(nowprocess)
+								deletediv(nowprocess)
+								createreadeydiv("readyquerylevel","readyprocess",nowprocess)
+								break
+							}
+						}
+						else if(readyquery[i-2].length<readyquerysize){
+							readyquery[i-2].push(nowprocess)
+							deletediv(nowprocess)
+							createreadeydiv("readyquerylevel","readyprocess",nowprocess)
+						}
+					}
 			}
 		}
 	}
-
-	}
+	
 	//重新将就绪队列的进程加入到运行队列
-	for(let i = readylevel;i>0;i++){
-		console.log(readyquery);
-		if(typeof(readyquery[i]) != "undefined"){
+	for(let i = readylevel-1;i>=0;i--){
+		//  console.log(readyquery[i][0])
+		if(typeof(readyquery[i][0]) == "object" ){
+			console.log(i);
 			if(readyquery[i].length>0){
-				runquery.push(readyquery[i].pop())
+				let temprunpcb = readyquery[i].shift()
+				temprunpcb.state = "run"
+				runquery.push(temprunpcb)
+				deletediv(temprunpcb)
+				creatediv("runquery","runprocess",temprunpcb)
 				break
 			}
 		}
-		else break
+		// else break
 	}
 	//将创建队列加入到就绪队列
 	if(newquery.length>0){
 		let temppcb = newquery.pop()
 		if(readyquery[temppcb.priority-1].length<readyquerysize){
+			// readyquery[temppcb.priority-1]
 			temppcb.state="ready"
 			readyquery[temppcb.priority-1].push(temppcb)
 			console.log(readyquery);
-			let readyquerydiv = "<div class = 'readyprocess'>"+ temppcb.id.toString() +" state "+temppcb.state.toString()+"</div>"
-			let tempstring = ".readyquerylevel"+temppcb.priority.toString()
-			$(tempstring).append(readyquerydiv)
-			let needdeletedpidstring = "[name='" + temppcb.id.toString + "']"
-			$("div").remove(needdeletedpidstring)
+			deletediv(temppcb)
+			createreadeydiv("readyquerylevel","readyprocess",temppcb)
+			// let readyquerydiv = "<div class = 'readyprocess'>"+ temppcb.id.toString() +" state "+temppcb.state.toString()+"</div>"
+			// let tempstring = ".readyquerylevel"+temppcb.priority.toString()
+			// $(tempstring).append(readyquerydiv)
+			
+			// let needdeletedpidstring = "[name='" + temppcb.id.toString + "']"
+			// $("div").remove(needdeletedpidstring)
 		}
+		else newquery.push(temppcb)
 	}
+	
+}
+function createreadeydiv(fatherclassname,divclassname,neededcreatepcb){
+	//通过classname加入div
+	let neededcreatediv = "<div class = '"+divclassname+"' "+"name='"+neededcreatepcb.id+"'>"
+							+ neededcreatepcb.id.toString() +
+							" state "+neededcreatepcb.state.toString()
+						  +"</div>"
+	let tempstring = "."+fatherclassname.toString() + neededcreatepcb.priority.toString()
+	$(tempstring).append(neededcreatediv)
+}
+function creatediv(fatherclassname,divclassname,neededcreatepcb){
+	//通过classname加入div
+	let neededcreatediv = "<div class = '"+divclassname+"' "+"name='"+neededcreatepcb.id+"'>"
+							+ neededcreatepcb.id.toString() +
+							" state "+neededcreatepcb.state.toString()
+						  +"</div>"
+	let tempstring = "."+fatherclassname.toString()
+	$(tempstring).append(neededcreatediv)
+}
+function deletediv(needdeletepcb){
+	//通过pcb的id查找name属性删除
+	// let a = document.getElementsByName(needdeletepcb.id.toString())
+	// a.parentNode.removeChild(a);
+	let needdeletedpidstring = "[name='" + needdeletepcb.id.toString() + "']"
+	$("div").remove(needdeletedpidstring)
+	return 1
 }
