@@ -7,7 +7,7 @@ function process(pid,priority,runtime,isblock,blocktime,blocklasttime){
 		blocklasttime:blocklasttime,
 		runtime:runtime,
 		priority:priority,
-		state:"new",
+		state:0,
 	}
 	return o;
 }
@@ -33,12 +33,12 @@ function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timesl
 							//应该加入阻塞队列，但这里直接非正常exit
 							alert("内存不够大，非正常exit")
 							blockquery.pop()
-							blockprocess.state = "exit"
+							blockprocess.state = 4
 							exitquery.push(blockprocess)
 						}
 						else {
 							blockquery.pop()
-							blockprocess.state="ready"
+							blockprocess.state=1
 							blockprocess.isblock = false
 							readyquery[0].push(blockprocess)
 							break
@@ -46,7 +46,7 @@ function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timesl
 					}
 					else if(readyquery[i-2].length<readyquerysize){
 						blockquery.pop()
-						blockprocess.state="ready"
+						blockprocess.state=1
 						blockprocess.isblock = false
 						readyquery[i-2].push(blockprocess)
 					}
@@ -66,19 +66,19 @@ function disposerunquery(runquery,runquerysize,runquerysize,readyquery,readyquer
 		}
 		if(nowprocess.blocktime <=0 && nowprocess.isblock == true){
 			if(blockquery.length<blockquerysize){
-				nowprocess.state = "block"
+				nowprocess.state = 3
 				blockquery.push(nowprocess)
 			}
 			else{
 				alert("内存不够大，非正常exit")
-				nowprocess.state = "exit"
+				nowprocess.state = 4
 				exitquery.push(nowprocess)
 			}
 		}
 		else{
 			if(nowprocess.runtime<=0){
 				//运行结束
-				nowprocess.state = "exit"
+				nowprocess.state = 4
 				exitquery.push(nowprocess)
 			}
 			else{
@@ -88,7 +88,7 @@ function disposerunquery(runquery,runquerysize,runquerysize,readyquery,readyquer
 							if(readyquery[0].length >= readyquerysize){
 								//应该加入阻塞队列，但这里直接非正常exit
 								alert("内存不够大，非正常exit")
-								nowprocess.state = "exit"
+								nowprocess.state = 4
 								exitquery.push(nowprocess)
 							}
 							else{
@@ -113,7 +113,7 @@ function readyTorun(readyquery,runquery,readylevel){
 		if(typeof(readyquery[i][0]) == "object" ){
 			if(readyquery[i].length>0){
 				let temprunpcb = readyquery[i].shift()
-				temprunpcb.state = "run"
+				temprunpcb.state = 2
                 runquery.push(temprunpcb)
 				break
 			}
@@ -126,7 +126,7 @@ function createtoready(newquery,readyquery,readyquerysize){
 		let temppcb = newquery.pop()
 		if(readyquery[temppcb.priority-1].length<readyquerysize){
 			// readyquery[temppcb.priority-1]
-			temppcb.state="ready"
+			temppcb.state=1
 			readyquery[temppcb.priority-1].push(temppcb)
 		}
 		else newquery.push(temppcb)

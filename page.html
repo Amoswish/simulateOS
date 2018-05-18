@@ -28,7 +28,7 @@
                                 <div class="box-card">
                                     <div class="card-title">创建进程队列</div>
                                     <div class="card-contain" v-for="o in this.newquery">
-                                        <el-card shadow="always"> {{o.id}}</el-card>
+                                        <el-card shadow="always" @click.native="showdetail(o)"> {{o.id}}dsd</el-card>
                                     </div>
                                 </div>
                             </div>
@@ -37,7 +37,7 @@
                                             运行的进程
                                     </div>
                                     <div v-for="o in this.runquery">
-                                            <el-card  class = "runprocess"shadow="always">
+                                            <el-card  class = "runprocess"shadow="always"  @click.native="showdetail(o)">
                                                     {{o.id}}
                                             </el-card>
                                     </div>
@@ -46,19 +46,19 @@
                         <div class="readyquery-blockquery">
                             <div class="readyquery">
                                 <div class="readyquery-title">就绪队列</div>
-                                <div class="priority" v-for="o in this.readyquery " >
-                                        <el-card  class = "readyprocesstitle"shadow="always">
-                                            优先级{{++i}}
+                                <div class="priority" v-for="(item, index) in this.readyquery " >
+                                        <el-card  class = "readyprocesstitle"shadow="always" v-bind:style="{ opacity: 0.2*(index+2) }">
+                                            优先级{{index+1}}
                                         </el-card>
-                                        <div class = "readyquery-contain" v-for="ready in o">
-                                            <el-card  class = "readyprocess"shadow="always">{{ready.id}}</el-card>
+                                        <div class = "readyquery-contain" v-for="ready in item">
+                                            <el-card  class = "readyprocess"shadow="always"  @click.native="showdetail(ready)">{{ready.id}}</el-card>
                                         </div>
                                 </div>
                             </div>
                             <div class="blockquery">
                                 <div class="blockquery-title">阻塞队列</div>
                                     <div v-for="o in this.blockquery">
-                                        <el-card  class = "blockprocess"shadow="always">{{o.id}}</el-card>
+                                        <el-card  class = "blockprocess"shadow="always"  @click.native="showdetail(o)">{{o.id}}</el-card>
                                     </div>
                             </div>
                         </div>
@@ -66,70 +66,88 @@
                     <div class="exitquery">
                         <div class="exitquery-title">退出队列</div>
                         <div v-for="o in this.exitquery">
-                                <el-card  class = "exitprocess" shadow="always">{{o.id}}</el-card>
+                                <el-card  class = "exitprocess" shadow="always"  @click.native="showdetail(o)">{{o.id}}</el-card>
                         </div>
                     </div>  
             </div>
             <div class="contain-right">
                     <div class = "createprocess">
-                            <el-form >
-                                <el-form-item label="密码" prop="pass">
-                                    <el-input type="password"  auto-complete="off"></el-input>
+                        
+                            <el-form :label-position='right'>
+                                <el-form-item >
+                                    <div class="block">
+                                        <span class="demonstration">优先级</span>
+                                        <el-slider v-model="pcb.priority" :step="1" show-stops :min="1" :max="4"></el-slider>
+                                      </div>
                                 </el-form-item>
-                                <el-form-item label="运行时间" prop="region">
+                                <el-form-item label="" prop="region">
+                                        <span class="demonstration">运行时间</span>
                                     <el-select  placeholder="请选择运行时间" v-model="pcb.runtime">
                                         <el-option label="1000" value="1000"></el-option>
                                         <el-option label="2000" value="2000"></el-option>
                                         <el-option label="3000" value="3000"></el-option>
                                     </el-select>
                                 </el-form-item>   
-                                <el-form-item label="是否阻塞" prop="delivery">
+                                <el-form-item label="" prop="delivery">
+                                        <span class="demonstration">是否阻塞</span>
                                     <el-switch  v-model="pcb.isblock"></el-switch>
                                 </el-form-item>
-                                <el-form-item label="阻塞时间" prop="region" v-if="pcb.isblock">
-                                    <el-select  placeholder="请选择阻塞时间" v-model="pcb.blocktime">
+                                <transition name="slide-fade">
+                                <el-form-item label="" prop="region" v-if="pcb.isblock">
+                                        <span class="demonstration">请选择阻塞时间</span>
+                                    <el-select  placeholder="" v-model="pcb.blocktime">
                                         <el-option label="1000" value="1000"></el-option>
                                         <el-option label="2000" value="2000"></el-option>
                                         <el-option label="3000" value="3000"></el-option>
                                     </el-select>
-                                </el-form-item> 
-                                <el-form-item label="阻塞持续时间" prop="region" v-if="pcb.isblock">
+                                </el-form-item>
+                            </transition>
+                            <transition name="slide-fade">
+                                <el-form-item label="" prop="region" v-show="pcb.isblock">
+                                        <span class="demonstration">请选择阻塞持续时间</span>
                                     <el-select  placeholder="请选择阻塞持续时间" v-model="pcb.blocklasttime">
                                         <el-option label="1000" value="1000"></el-option>
                                         <el-option label="2000" value="2000"></el-option>
                                         <el-option label="3000" value="3000"></el-option>
                                     </el-select>
-                                </el-form-item> 
+                                </el-form-item>
+                            </transition>
                                 <el-form-item>
                                     <el-button type="primary" @click="createprocesstonewquery()">立即创建</el-button>
                                     <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
                                 </el-form-item>
                                 
                             </el-form>
-                            <button class="btn btn-primary" v-on:click="run()">运行</button>
+                            <button class="btn btn-primary" v-if="beginstate == false" v-on:click="begin()">开始</button>
+                            <button class="btn btn-primary" v-if="beginstate == true" v-on:click="pause()">暂停</button>
                         </div>
             </div>
-        </div>  
-        <div class = "processinfo">
-            <div>
-                <el-steps :space="200" :active="2" finish-status="success">
-                    <el-step title="创建"></el-step>
-                    <el-step title="就绪"></el-step>
-                    <el-step title="运行"></el-step>
-                    <el-step title="阻塞"></el-step>
-                    <el-step title="退出"></el-step>
-                </el-steps> 
-            </div>
-                <button class="btn btn-primary" style="">阻塞</button>
-                <button class="btn btn-primary" >恢复</button>
-        </div>
+        </div> 
+        <transition name="slide-fade">
+            <div class = "processinfo" v-show="clickpcb.isclick">
+                    <div>
+                        <el-steps :space="200" :active="clickpcb.state" finish-status="success">
+                            <el-step title="创建"></el-step>
+                            <el-step title="就绪"></el-step>
+                            <el-step title="运行"></el-step>
+                            <el-step title="阻塞"></el-step>
+                            <el-step title="退出"></el-step>
+                        </el-steps> 
+                    </div>
+                        <button class="btn btn-primary" v-if="clickpcb.state < 3 && clickpcb.state > 0" @click="toblock(clickpcb)">阻塞</button>
+                        <button class="btn btn-primary" v-if="clickpcb.state == 3" @click="torecover(clickpcb)">恢复</button>
+                </div>
+        </transition>
+
     </div>
+</transition>
 </body>
 <script>
     	var app = new Vue({
 		el: '#app',
 		data: function (){
            return  {
+            nowpriority:1,
             newquery:[],
             runquery:[],
             readyquery:[],
@@ -155,8 +173,23 @@
                 blocklasttime:1000,
                 runtime:1000,
                 priority:1,
-                state:"new",
-            }
+                state:0,
+            },
+            clickpcb :{
+                id: 0, 
+                name: 'A',
+                size:10,
+                isblock: false,
+                blocktime:1000,
+                blocklasttime:1000,
+                runtime:1000,
+                priority:1,
+                state:0,
+                clickprocessstate:0,
+                isclick:false,
+            },
+            beginstate:false,
+            beginid:0,
         }
         },
         methods:{
@@ -170,6 +203,14 @@
                     alert("队列已满，请等待")
                 }
                 console.log(this.newquery)
+            },
+            showdetail:function(nowprocess){
+                console.log(nowprocess)
+                this.clickpcb.isclick = true
+                this.clickpcb.state = nowprocess.state
+                setTimeout(function (){
+                    app.clickpcb.isclick=false
+                },2000)
             },
             run:function(){
                 //处理阻塞队列
@@ -192,8 +233,35 @@
                 let obj4 =  createtoready(this.newquery,this.readyquery,this.readyquerysize)
                 this.newquery = obj4.newquery
                 this.readyquery = obj4.readyquery
-            }
-	
+            },
+            begin:function(){
+                this.beginstate = true
+                this.beginid = setInterval(() =>{ 
+                    this.run();
+                },1000)
+            },
+            pause:function(){
+                this.beginstate = false
+                clearInterval(this.beginid);
+            },
+            toblock:function(clickpcb){
+                try {
+                    if(clickpcb.state == 1){
+                    }
+                    if(clickpcb.state == 2){
+                        runquery[0].isblock = true;
+                        runquery[0].blocktime = 0;
+                    }
+                } catch (error) {
+                    
+                }
+            },
+            torecover:function(clickpcb){
+                try {
+                    
+                } catch (error) {
+                }
+            },
         }
 	})
     </script>
@@ -212,12 +280,14 @@
         display: flex;
         flex: 2;
     }
+    .el-form{
+        margin-right: 2%;
+    }
     .box-card{
         height: 50ex;
         background-color:beige;
         box-shadow: 5ex;
         margin: 3% 3% 4% 4%;
-        border: 1px;
         text-decoration: none; 
         color: #444; 
         box-shadow: 0 8px 9px rgba(0,0,0,0.1); 
@@ -227,6 +297,9 @@
         transition: all .1s ease-in;
         /* border-style: solid; */
         border-color: grey;
+        border: 0.1ex;
+        border-style: solid;
+        border-color: rgba(128, 128, 128, 0.267);
     }
     .card:hover { 
         top: -2px; 
@@ -248,7 +321,12 @@
         display: flex;
         flex-direction: column;
         flex: 1;
-        background-color: bisque;
+        margin-top: 1ex;
+        background-color: rgba(255, 228, 196, 0.233);
+        border-color: grey;
+        border: 0.1ex;
+        border-style: solid;
+        border-color: rgba(128, 128, 128, 0.267);
     }
     .createquery-runquery{
         display: flex;
@@ -265,13 +343,27 @@
         display: flex;
         flex-direction: column;
         flex: 7;
+
         /* background-color:darkturquoise; */
     }
     .runquery{
         display: flex;
         flex-direction: column;
         flex: 3;
-        background-color:cornsilk;
+        margin-top:2%; 
+        margin-left: 4%;
+        width: 93%;
+        background-color:rgba(0, 0, 0, 0.068);
+        border: 0.1ex;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.082);
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2); 
+    }
+    .runquery-title{
+        text-align: center;
+        font-size: 25px;
+        border-style:none  none solid none; 
+        border-color: rgba(0, 0, 0, 0.137)
     }
     .runprocess{
         margin-top:8%; 
@@ -329,7 +421,11 @@
         flex-direction: row;
         flex: 2;
         margin: 1% 1% 1% 1%;
-        background-color:rgba(186, 201, 47, 0.418);
+        border: 0.1ex;
+        border-style: solid;
+        border-color: rgba(128, 128, 128, 0.267);
+        background-color:rgba(186, 201, 47, 0.027);
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2); 
     }
     .blockquery-title{
         writing-mode:vertical-rl;
@@ -352,7 +448,7 @@
     }
     .exitprocess{
         margin-top: 3%;
-        background-color: rgba(23, 23, 231, 0.486);
+        background-color: rgba(23, 23, 231, 0.438);
     }
   .createquery-title{
       height: 5ex;
@@ -360,14 +456,39 @@
       margin-left: 0px;
       /* text-align: center; */
   }
-  .createprocess{
-      height: 5px;
+  .el-form{
+    /* height: 5px; */
+    margin-left: 10%;
+    margin-top: 10%;
+      border-style: solid;
+        border-color: rgba(128, 128, 128, 0.267);
+        background-color:rgba(186, 201, 47, 0.027);
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2); 
   }
   .processinfo{
       margin-left: 3%;
+      margin-top: 5%;
       /* width: 80%; */
       /* display: flex; */
       /* flex-direction: row; */
   }
+  .el-form-item{
+      /* display: flex; */
+      text-align: center;
+      /* flex-direction: col; */
+  }
+  /* 可以设置不同的进入和离开动画 */
+/* 设置持续时间和动画函数 */
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
   </style>
 </html>
