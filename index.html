@@ -2,8 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>模拟操作系统</title>		
+		<title>模拟操作系统</title>
+		<!-- 引入样式 -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<!-- 引入组件库 -->
 		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
 		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 		<script src="bootstrap/js/bootstrap.min.js"></script>
@@ -13,89 +17,87 @@
 	</head>
 	<body>
 		<div class = "" id = "app">
-		<div class = "main-contain">
-			<div class="processdetail">
-				aaaaaaa
-				<div class="processdetail-pid">pid</div>
-				<div class="processdetail-state">state</div>
-				<div class="processdetail-runtime">
-					runtime
-					<select name="runtime" id="modifyruntime" style="display: none;">
-						<option value="1000">1000</option>
-						<option value="2000">2000</option>
-						<option value="3000">3000</option>
-					</select>
+		<div class="main-contain ">
+				<el-card class="box-card"></el-card>
+				<div class="processdetail">
+						aaaaaaa
+						<div class="processdetail-pid">pid</div>
+						<div class="processdetail-state">state</div>
+						<div class="processdetail-runtime">
+							runtime
+							<select name="runtime" id="modifyruntime" style="display: none;">
+								<option value="1000">1000</option>
+								<option value="2000">2000</option>
+								<option value="3000">3000</option>
+							</select>
+						</div>
+						<div class="processdetail-priority">priority</div>
+						<div class="processdetail-isblock">
+							is I/O
+							<select name="createisblock" id="modifyblock">
+								<option value="false">否</option>
+								<option value="true">是</option>
+							</select>
+						</div>
+						<div class="processdetail-blocktime">
+								I/O time
+								<select name="blocktime" id="modifyblocktime" style="display: none;">
+									
+									<option value="1000">1000</option>
+									<option value="2000">2000</option>
+									<option value="3000">3000</option>
+								</select>
+						</div>
+						<div class="processdetail-blocklasttime">
+							<select name="blocklasttime" id="modifyblocklasttime" style="display: none;" >
+									<option value="1000">1000</option>
+									<option value="2000">2000</option>
+									<option value="3000">3000</option>
+								</select>
+						</div>
+						<button class="btn btn-danger">modify</button>
+					</div>
+				</el-card>
+			<div class = "main-detail">
+				<div class = "newquery">
+						<div class="alert alert-success query-title" role="alert" >创建进程队列</div>
 				</div>
-				<div class="processdetail-priority">priority</div>
-				<div class="processdetail-isblock">
-					is I/O
-					<select name="createisblock" id="modifyblock">
-						<option value="false">否</option>
-						<option value="true">是</option>
-					</select>
-				</div>
-				<div class="processdetail-blocktime">
-						I/O time
-						<select name="blocktime" id="modifyblocktime" style="display: none;">
-							
-							<option value="1000">1000</option>
-							<option value="2000">2000</option>
-							<option value="3000">3000</option>
-						</select>
-				</div>
-				<div class="processdetail-blocklasttime">
-					<select name="blocklasttime" id="modifyblocklasttime" style="display: none;" >
-							<option value="1000">1000</option>
-							<option value="2000">2000</option>
-							<option value="3000">3000</option>
-						</select>
-				</div>
-				<button class="btn btn-danger">modify</button>
-			</div>
-			<p class="title-info">创建进程队列</p>
-			<div></div>			
-			<div class = "newquery ">
-				<!-- <div class = "newprocess">
-					<div class="processtitle">进程id</div>
-					<div class="processcontain">state</div>
-					<button class=" btn btn-info processinfo">详情</button>
-				</div> -->
-			</div>
-			<div class = "query readyquery">
-				<p class="title-info">优先级1</p>
-				<div class = "panel-body readylevelquery readyquerylevel1">
+				<div class = "query readyquery">
 					
-					<!-- <div class="card bg-info text-white readyprocess"></div>
-					<div class="readyprocess"></div> -->
+					<div class = "panel-body readylevelquery readyquerylevel1" id="1">
+						<div class="alert alert-primary  query-title" role="alert">优先级1</div>
+					</div>
+					<div class = "readylevelquery readyquerylevel2" id="2">
+						<div class="alert alert-secondary query-title" role="alert">优先级2</div>
+						<!-- <div class="readyprocess"></div> -->
+						<!-- <div class="readyprocess"></div> -->
+					</div>
+					<div class = "readylevelquery readyquerylevel3" id="3">
+						<div class="alert alert-success query-title" role="alert">优先级3</div>
+						<!-- <div class="readyprocess"></div> -->
+						<!-- <div class="readyprocess"></div> -->
+					</div>
+					<div class = "readylevelquery readyquerylevel4" id ="4">
+						<div class="alert alert-danger query-title" role="alert">优先级4</div>
+						<!-- <div class="readyprocess"></div> -->
+						<!-- <div class="readyprocess"></div> -->
+					</div>
+					<!--<div class="readyprocess"></div>-->
+					<!--<div class="readyprocess"></div>-->
 				</div>
-				<div class = "readylevelquery readyquerylevel2">
-					<p class="title-info">优先级2</p>
-					<!-- <div class="readyprocess"></div> -->
-					<!-- <div class="readyprocess"></div> -->
+				<div class = "query runquery">
+					<div class="alert alert-warning  query-title" role="alert">运行进程队列</div>
 				</div>
-				<div class = "readylevelquery readyquerylevel3">
-					<p class="title-info">优先级3</p>
-					<!-- <div class="readyprocess"></div> -->
-					<!-- <div class="readyprocess"></div> -->
+				<div class = "query blockquery">
+						<div class="alert alert-dark  query-title" role="alert">阻塞进程队列</div>
+					<!-- <div class="blockprocess"></div> -->
+					<!-- <div class="blockprocess"></div> -->
 				</div>
-				<div class = "readylevelquery readyquerylevel4">
-					<p class="title-info">优先级4</p>
-					<!-- <div class="readyprocess"></div> -->
-					<!-- <div class="readyprocess"></div> -->
+				<div class = "exitquery">
+						<div class="alert alert-dark  query-title" role="alert">退出进程队列</div>
 				</div>
-				<!--<div class="readyprocess"></div>-->
-				<!--<div class="readyprocess"></div>-->
-			</div>
-			<div class = "query runquery">
-				<p class="title-info">运行进程队列</p>
-			</div>
-			<div class = "query blockquery">
-				<p class="title-info">阻塞进程队列</p>
-				<!-- <div class="blockprocess"></div> -->
-				<!-- <div class="blockprocess"></div> -->
-			</div>
-			<div class = "exitquery">
-				<p class="title-info">退出进程</p>
+			
+			
 			</div>
 		</div>
 		<div class = "createprocess">
@@ -149,83 +151,5 @@
 	})
 </script>
 <style>
-	.query{
-		/*display: inline-block;*/
-	}
-	.newquery,.readylevelquery,.runquery ,.blockquery{
-		height: 80px;
-	}
-	.newquery > .newprocess{
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-		background-color: rgb(255,250,205);
-		/* border:dotted; */
-		border-radius: 10%;
-	}
-	.readyquery > .readylevelquery >.readyprocess{
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-		background-color: rgb(255,250,205);
-		/* border:dotted; */
-		border-radius: 10%;
-	}
-	.runquery > .runprocess{
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-		background-color: rgb(255,250,205);
-		/* border:dotted; */
-		border-radius: 10%;
-	}
-	.blockquery > .blockprocess{
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-		background-color: rgb(255,250,205);
-		/* border:dotted; */
-		border-radius: 10%;
-	}
-	.exitquery> .exitprocess{
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-		background-color: rgb(255,250,205);
-		/* border:dotted; */
-		border-radius: 10%;
-	}
-	.title-info{
-		margin-left: 2%;
-		width: 20%;
-		background-color:rgb(220,220,220);
-		text-align: center;
-		/* font-family: "微软简综艺"; */
-		border-radius: 15ex;
-	}
-	.processtitle{
-		/* margin-left: 5%; */
-		background-color: rgba(110, 202, 245, 0.233);
-		text-align: center;
-		border-radius: 15ex;
-	}
-	.processcontain{
-		background-color:rgb(238, 110, 110);	
-		text-align: center;
-		border-radius: 15ex;
-	}
-	.processinfo{
-		margin-left: 20%;
-		margin-top: 5%;
-		margin-bottom: 0%;
-		height: 3ex;
-	}
-	.processdetail{
-		position: absolute;
-		margin-left: 80%;
-		margin-top: 20%;
-		width: 100px;
-		height: 100px;
-		background-color:gray;
-	}
+
 </style>

@@ -1,0 +1,153 @@
+
+    .main-contain{
+        display: flex;
+        margin-left: 3%;
+        margin-top: 3%;
+        height: 500px;
+    }
+    .contain-left{
+        display: flex;
+        flex: 8;
+    }
+    .contain-right{
+        display: flex;
+        flex: 2;
+    }
+    .box-card{
+        height: 50ex;
+        background-color:beige;
+        box-shadow: 5ex;
+        margin: 3% 3% 4% 4%;
+        border: 1px;
+        text-decoration: none; 
+        color: #444; 
+        box-shadow: 0 8px 9px rgba(0,0,0,0.1); 
+        display: flex; 
+        flex-direction: column; 
+        position: relative; top: 0; 
+        transition: all .1s ease-in;
+        /* border-style: solid; */
+        border-color: grey;
+    }
+    .card:hover { 
+        top: -2px; 
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2); 
+        }
+    .box-card > .card-title{
+        text-align: center;
+        font-size: 25px;
+        height: 15%;
+        border-style:none  none solid none; 
+    }
+    .normalprocess{
+        display: flex;
+        flex-direction: row;
+        flex: 9;
+        /* background-color: aqua; */
+    }
+    .exitquery{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        background-color: bisque;
+    }
+    .createquery-runquery{
+        display: flex;
+        flex: 2;
+        flex-direction: column;
+    }
+    .readyquery-blockquery{
+        display: flex;
+        flex: 8;
+        flex-direction: column;
+    }
+    .createquery{
+        display: flex;
+        flex-direction: column;
+        flex: 7;
+        /* background-color:darkturquoise; */
+    }
+    .runquery{
+        display: flex;
+        flex-direction: column;
+        flex: 3;
+        background-color:cornsilk;
+    }
+    .runprocess{
+        margin-top:8%; 
+        margin-left: 8%;
+        height: 80%;
+        width: 80%;
+        background-color:rgba(243, 14, 14, 0.575);
+    }
+    .readyquery{
+        display: flex;
+        flex-direction: column;
+        flex: 8;
+        background-color:lightskyblue;
+    }
+    .readyquery-title{
+        text-align: center;
+        font-size: 20px;
+        border-style:none  none solid none; 
+    }
+    .readyquery > .priority{
+        margin-left: 3%;
+        display: flex;
+        flex-direction: row;
+    }
+    .readyquery > .priority > .readyprocesstitle{
+        display: flex;
+        margin-top: 2%;
+        width: 15%;
+        height: 20%;
+        background-color: gray;
+        flex-direction: column;
+    }
+    .readyprocess{
+        display: flex;
+        margin-top: 2%;
+        margin-left: 3%;
+        width: 15%;
+        height: 20%;
+        /* background-color: gray; */
+        flex-direction: column;
+    }
+    .blockquery{
+        display: flex;
+        flex-direction: row;
+        flex: 2;
+        background-color:rgba(185, 201, 47, 0.836);
+    }
+    .blockquery-title{
+        writing-mode:vertical-rl;
+        font-size: 20px;
+        text-align: center;
+        border-style:none  solid none none; 
+    }
+    .blockquery >.blockprocess{
+        margin-top: 2%;
+        margin-left: 3%;
+        height: 80%;
+        background-color: chartreuse;
+    }
+    .exitquery-title{
+       font-size: 20px;
+       text-align: center;
+        font-size: 20px;
+        height: 10%;
+        border-style:none  none solid none; 
+    }
+    .exitprocess{
+        margin-top: 3%;
+        background-color: rgba(23, 23, 231, 0.486);
+    }
+  .createquery-title{
+      height: 5ex;
+      width: 5ex;
+      margin-left: 0px;
+      /* text-align: center; */
+  }
+  .createprocess{
+      height: 5px;
+  }

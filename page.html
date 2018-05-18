@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SimulateOS</title>
+</head>
+		<!-- 引入样式 -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+        <!-- 引入组件库 -->
+        <script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+        <!-- <script src="js/main.js" type="text/javascript" charset="utf-8"></script> -->
+        <script src="js/utils.js"></script>
+		<script src="js/pageinteraction.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/createnewprocess.js" type="text/javascript" charset="utf-8"></script>
+<body>
+    <div id="app">
+        <div class="main-contain">
+            <div class="contain-left">
+                <div class="normalprocess">
+                        <div class="createquery-runquery">
+                            <div class="createquery">
+                                <div class="box-card">
+                                    <div class="card-title">创建进程队列</div>
+                                    <div class="card-contain" v-for="o in this.newquery">
+                                        <el-card shadow="always"> {{o.id}}</el-card>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="runquery">
+                                    <div class="runquery-title" shadow="always">
+                                            运行的进程
+                                    </div>
+                                    <div v-for="o in this.runquery">
+                                            <el-card  class = "runprocess"shadow="always">
+                                                    {{o.id}}
+                                            </el-card>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="readyquery-blockquery">
+                            <div class="readyquery">
+                                <div class="readyquery-title">就绪队列</div>
+                                <div class="priority" v-for="o in this.readyquery " >
+                                        <el-card  class = "readyprocesstitle"shadow="always">
+                                            优先级{{++i}}
+                                        </el-card>
+                                        <div class = "readyquery-contain" v-for="ready in o">
+                                            <el-card  class = "readyprocess"shadow="always">{{ready.id}}</el-card>
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="blockquery">
+                                <div class="blockquery-title">阻塞队列</div>
+                                    <div v-for="o in this.blockquery">
+                                        <el-card  class = "blockprocess"shadow="always">{{o.id}}</el-card>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exitquery">
+                        <div class="exitquery-title">退出队列</div>
+                        <div v-for="o in this.exitquery">
+                                <el-card  class = "exitprocess" shadow="always">{{o.id}}</el-card>
+                        </div>
+                    </div>  
+            </div>
+            <div class="contain-right">
+                    <div class = "createprocess">
+                            <el-form >
+                                <el-form-item label="密码" prop="pass">
+                                    <el-input type="password"  auto-complete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="运行时间" prop="region">
+                                    <el-select  placeholder="请选择运行时间" v-model="pcb.runtime">
+                                        <el-option label="1000" value="1000"></el-option>
+                                        <el-option label="2000" value="2000"></el-option>
+                                        <el-option label="3000" value="3000"></el-option>
+                                    </el-select>
+                                </el-form-item>   
+                                <el-form-item label="是否阻塞" prop="delivery">
+                                    <el-switch  v-model="pcb.isblock"></el-switch>
+                                </el-form-item>
+                                <el-form-item label="阻塞时间" prop="region" v-if="pcb.isblock">
+                                    <el-select  placeholder="请选择阻塞时间" v-model="pcb.blocktime">
+                                        <el-option label="1000" value="1000"></el-option>
+                                        <el-option label="2000" value="2000"></el-option>
+                                        <el-option label="3000" value="3000"></el-option>
+                                    </el-select>
+                                </el-form-item> 
+                                <el-form-item label="阻塞持续时间" prop="region" v-if="pcb.isblock">
+                                    <el-select  placeholder="请选择阻塞持续时间" v-model="pcb.blocklasttime">
+                                        <el-option label="1000" value="1000"></el-option>
+                                        <el-option label="2000" value="2000"></el-option>
+                                        <el-option label="3000" value="3000"></el-option>
+                                    </el-select>
+                                </el-form-item> 
+                                <el-form-item>
+                                    <el-button type="primary" @click="createprocesstonewquery()">立即创建</el-button>
+                                    <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+                                </el-form-item>
+                                
+                            </el-form>
+                            <button class="btn btn-primary" v-on:click="run()">运行</button>
+                        </div>
+            </div>
+        </div>  
+        <div class = "processinfo">
+            <div>
+                <el-steps :space="200" :active="2" finish-status="success">
+                    <el-step title="创建"></el-step>
+                    <el-step title="就绪"></el-step>
+                    <el-step title="运行"></el-step>
+                    <el-step title="阻塞"></el-step>
+                    <el-step title="退出"></el-step>
+                </el-steps> 
+            </div>
+                <button class="btn btn-primary" style="">阻塞</button>
+                <button class="btn btn-primary" >恢复</button>
+        </div>
+    </div>
+</body>
+<script>
+    	var app = new Vue({
+		el: '#app',
+		data: function (){
+           return  {
+            newquery:[],
+            runquery:[],
+            readyquery:[],
+            blockquery:[],
+            exitquery:[],
+            memory : 10000,
+            readylevel: 4,//一共多少个优先级
+            readyquerysize : 4,
+            everyreadyquerysize :4,
+            newquerysize : 4,
+            blockquerysize : 4,
+            runquerysize : 1,
+            readyquery : [[],[],[],[]],
+            timeslice : [500,500,500,500],
+            pid : 0,
+            newquerysize:4,
+            pcb :{
+                id: 0, 
+                name: 'A',
+                size:10,
+                isblock: false,
+                blocktime:1000,
+                blocklasttime:1000,
+                runtime:1000,
+                priority:1,
+                state:"new",
+            }
+        }
+        },
+        methods:{
+            createprocesstonewquery: function(){
+                if(this.newquery.length<this.newquerysize){
+                    this.newquery.unshift(createprocess(this.pcb))
+                    this.pcb.id = this.pcb.id +1
+                    this.pid = this.pid + 1
+                }
+                else{
+                    alert("队列已满，请等待")
+                }
+                console.log(this.newquery)
+            },
+            run:function(){
+                //处理阻塞队列
+                let obj1 = disposeblockquery(this.blockquery,this.readyquery,this.readyquerysize,this.exitquery,this.timeslice)
+                this.blockquery = obj1.blockquery
+                this.readyquery = obj1.readyquery
+                this.exitquery = obj1.exitquery
+                // console.log(obj1)
+                //对运行队列进行处理
+                let obj2 = disposerunquery(this.runquery,this.runquerysize,this.runquerysize,this.readyquery,this.readyquerysize,this.blockquery,this.blockquerysize,this.exitquery,this.timeslice)
+                this.runquery = obj2.runquery
+                this.readyquery = obj2.readyquery
+                this.blockquery = obj2.blockquery
+                this.exitquery = obj2.exitquery
+                //重新将ready队列中的程序加入到运行队列
+                let obj3 = readyTorun(this.readyquery,this.runquery,this.readylevel)
+                this.runquery = obj3.runquery
+                this.readyquery = obj3.readyquery
+                //将创建队列加入到就绪队列
+                let obj4 =  createtoready(this.newquery,this.readyquery,this.readyquerysize)
+                this.newquery = obj4.newquery
+                this.readyquery = obj4.readyquery
+            }
+	
+        }
+	})
+    </script>
+<style>
+    .main-contain{
+        display: flex;
+        margin-left: 3%;
+        margin-top: 3%;
+        height: 500px;
+    }
+    .contain-left{
+        display: flex;
+        flex: 8;
+    }
+    .contain-right{
+        display: flex;
+        flex: 2;
+    }
+    .box-card{
+        height: 50ex;
+        background-color:beige;
+        box-shadow: 5ex;
+        margin: 3% 3% 4% 4%;
+        border: 1px;
+        text-decoration: none; 
+        color: #444; 
+        box-shadow: 0 8px 9px rgba(0,0,0,0.1); 
+        display: flex; 
+        flex-direction: column; 
+        position: relative; top: 0; 
+        transition: all .1s ease-in;
+        /* border-style: solid; */
+        border-color: grey;
+    }
+    .card:hover { 
+        top: -2px; 
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2); 
+        }
+    .box-card > .card-title{
+        text-align: center;
+        font-size: 25px;
+        height: 15%;
+        border-style:none  none solid none; 
+    }
+    .normalprocess{
+        display: flex;
+        flex-direction: row;
+        flex: 9;
+        /* background-color: aqua; */
+    }
+    .exitquery{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        background-color: bisque;
+    }
+    .createquery-runquery{
+        display: flex;
+        flex: 2;
+        flex-direction: column;
+    }
+    .readyquery-blockquery{
+        display: flex;
+        flex: 8;
+        flex-direction: column;
+    }
+    
+    .createquery{
+        display: flex;
+        flex-direction: column;
+        flex: 7;
+        /* background-color:darkturquoise; */
+    }
+    .runquery{
+        display: flex;
+        flex-direction: column;
+        flex: 3;
+        background-color:cornsilk;
+    }
+    .runprocess{
+        margin-top:8%; 
+        margin-left: 8%;
+        height: 80%;
+        width: 80%;
+        background-color:rgba(243, 14, 14, 0.575);
+    }
+    .readyquery{
+        display: flex;
+        flex-direction: column;
+        flex: 8;
+        background-color:rgba(135, 206, 250, 0.164);
+        margin: 1% 1% 1% 1%;
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2);  
+    }
+    .readyquery-title{
+        text-align: center;
+        font-size: 25px;
+        border-style:none  none solid none; 
+    }
+    .readyquery > .priority{
+        margin-left: 3%;
+        display: flex;
+        flex-direction: row;
+    }
+    .readyquery > .priority > .readyprocesstitle{
+        display: flex;
+        margin-top: 2%;
+        width: 15%;
+        height: 20%;
+        background-color: gray;
+        flex-direction: column;
+        font-size: 15px;
+    }
+    .readyquery-contain{
+        display: flex;
+        margin-top: 2%;
+        width: 15%;
+        height: 80%;
+        flex-direction: column;
+        font-size: 15px;
+    }
+    .readyprocess{
+        display: flex;
+        margin-top: 2%;
+        margin-left: 3%;
+        /* width: 15%; */
+        /* height: 80%; */
+        /* background-color: gray; */
+        flex-direction: column;
+    }
+    .blockquery{
+        display: flex;
+        flex-direction: row;
+        flex: 2;
+        margin: 1% 1% 1% 1%;
+        background-color:rgba(186, 201, 47, 0.418);
+    }
+    .blockquery-title{
+        writing-mode:vertical-rl;
+        font-size: 20px;
+        text-align: center;
+        border-style:none  solid none none; 
+    }
+    .blockquery >.blockprocess{
+        margin-top: 2%;
+        margin-left: 3%;
+        height: 80%;
+        background-color: chartreuse;
+    }
+    .exitquery-title{
+       font-size: 20px;
+       text-align: center;
+        font-size: 20px;
+        height: 10%;
+        border-style:none  none solid none; 
+    }
+    .exitprocess{
+        margin-top: 3%;
+        background-color: rgba(23, 23, 231, 0.486);
+    }
+  .createquery-title{
+      height: 5ex;
+      width: 5ex;
+      margin-left: 0px;
+      /* text-align: center; */
+  }
+  .createprocess{
+      height: 5px;
+  }
+  .processinfo{
+      margin-left: 3%;
+      /* width: 80%; */
+      /* display: flex; */
+      /* flex-direction: row; */
+  }
+  </style>
+</html>

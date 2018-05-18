@@ -1,4 +1,3 @@
-
 const memory = 10000
 const readylevel = 4//一共多少个优先级
 const readyquerysize = 4
@@ -66,8 +65,6 @@ function pcb(priority,runtime,isblock,blocktime,blocklasttime){
 }
 function init(){
 	//创建就绪队列
-	console.log("sss");
-	
 	
 }
 function createprocess(priority,runtime,isblock,blocktime,blocklasttime){
