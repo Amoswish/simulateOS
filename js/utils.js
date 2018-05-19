@@ -6,6 +6,7 @@ function process(pid,priority,runtime,isblock,blocktime,blocklasttime){
 		blocktime:blocktime,
 		blocklasttime:blocklasttime,
 		runtime:runtime,
+		numberofruntime:0,
 		priority:priority,
 		state:0,
 	}
@@ -19,7 +20,7 @@ function createprocess(pcb){
     let newpcb = process(pcb.id,pcb.priority,pcb.runtime,pcb.isblock,pcb.blocktime,pcb.blocklasttime)
     return newpcb
 }
-function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timeslice){
+function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timeslice,blockquerysize){
 	//将阻塞队列进行处理
 	if(blockquery.length>0){
 		for (let j = 0;j<blockquery.length;j++){
@@ -31,13 +32,18 @@ function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timesl
 					if(i == 1){
 						if(readyquery[0].length >= readyquerysize){
 							//应该加入阻塞队列，但这里直接非正常exit
-							alert("内存不够大，非正常exit")
-							blockquery.pop()
-							blockprocess.state = 4
-							exitquery.push(blockprocess)
+							if(blockquery.length<blockquerysize){
+								blockquery.shift()
+								blockprocess.state = 4
+								blockquery.push(blockprocess)
+								break
+							}
+							else{
+								alert("阻塞队列不够大，非正常exit")
+							}
 						}
 						else {
-							blockquery.pop()
+							blockquery.shift()
 							blockprocess.state=1
 							blockprocess.isblock = false
 							readyquery[0].push(blockprocess)
@@ -45,10 +51,11 @@ function disposeblockquery(blockquery,readyquery,readyquerysize,exitquery,timesl
 						}
 					}
 					else if(readyquery[i-2].length<readyquerysize){
-						blockquery.pop()
+						blockquery.shift()
 						blockprocess.state=1
 						blockprocess.isblock = false
 						readyquery[i-2].push(blockprocess)
+						break
 					}
 				}
 			}
@@ -61,7 +68,8 @@ function disposerunquery(runquery,runquerysize,runquerysize,readyquery,readyquer
 	if(runquery.length <= runquerysize && runquery.length > 0){
 		let nowprocess = runquery.pop()
 		nowprocess.runtime = nowprocess.runtime - timeslice[nowprocess.priority-1]
-		if(nowprocess.isblock == true){
+		nowprocess.numberofruntime = nowprocess.numberofruntime + 1
+		if(nowprocess.isblock == true && nowprocess.runtime > 0){
 			nowprocess.blocktime = nowprocess.blocktime - timeslice[nowprocess.priority-1]
 		}
 		if(nowprocess.blocktime <=0 && nowprocess.isblock == true){
@@ -70,7 +78,7 @@ function disposerunquery(runquery,runquerysize,runquerysize,readyquery,readyquer
 				blockquery.push(nowprocess)
 			}
 			else{
-				alert("内存不够大，非正常exit")
+				alert("加入不到阻塞队列，阻塞队列不够长，非正常exit")
 				nowprocess.state = 4
 				exitquery.push(nowprocess)
 			}

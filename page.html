@@ -27,20 +27,24 @@
                             <div class="createquery">
                                 <div class="box-card">
                                     <div class="card-title">创建进程队列</div>
-                                    <div class="card-contain" v-for="o in this.newquery">
-                                        <el-card shadow="always" @click.native="showdetail(o)"> {{o.id}}dsd</el-card>
+                                    <transition-group name="list" tag="p">
+                                    <div class="card-contain list-item" v-for="o in this.newquery" v-bind:key="o">
+                                        <el-card shadow="always" @click.native="showdetail(o)"> Id:{{o.id}} 剩余时间{{o.runtime}}</el-card>
                                     </div>
+                                    </transition-group>
                                 </div>
                             </div>
                             <div class="runquery">
                                     <div class="runquery-title" shadow="always">
                                             运行的进程
                                     </div>
-                                    <div v-for="o in this.runquery">
+                                    <transition-group name="list" tag="p">
+                                    <div v-for="o in this.runquery" v-bind:key="o">
                                             <el-card  class = "runprocess"shadow="always"  @click.native="showdetail(o)">
-                                                    {{o.id}}
+                                                    Id:{{o.id}} 剩余时间{{o.runtime}}
                                             </el-card>
                                     </div>
+                                </transition-group>
                             </div>
                         </div>
                         <div class="readyquery-blockquery">
@@ -50,24 +54,28 @@
                                         <el-card  class = "readyprocesstitle"shadow="always" v-bind:style="{ opacity: 0.2*(index+2) }">
                                             优先级{{index+1}}
                                         </el-card>
-                                        <div class = "readyquery-contain" v-for="ready in item">
-                                            <el-card  class = "readyprocess"shadow="always"  @click.native="showdetail(ready)">{{ready.id}}</el-card>
+                                        <!-- <transition-group name="list"> -->
+                                        <div class = "readyquery-contain list-item" v-for="ready in item" v-bind:key="ready">
+                                            <el-card  class = "readyprocess"shadow="always"  @click.native="showdetail(ready)">进程Id:{{ready.id}}   剩余时间:{{ready.runtime}}</el-card>
                                         </div>
+                                    <!-- </transition-group> -->
                                 </div>
                             </div>
                             <div class="blockquery">
                                 <div class="blockquery-title">阻塞队列</div>
-                                    <div v-for="o in this.blockquery">
-                                        <el-card  class = "blockprocess"shadow="always"  @click.native="showdetail(o)">{{o.id}}</el-card>
+                                    <div v-for="o in this.blockquery" v-bind:key="o" >
+                                        <el-card  class = "blockprocess"shadow="always"  @click.native="showdetail(o)">Id:{{o.id}} 剩余阻塞时间{{o.blocklasttime}}</el-card>
                                     </div>
                             </div>
                         </div>
                     </div>
                     <div class="exitquery">
                         <div class="exitquery-title">退出队列</div>
-                        <div v-for="o in this.exitquery">
-                                <el-card  class = "exitprocess" shadow="always"  @click.native="showdetail(o)">{{o.id}}</el-card>
+                        <transition-group name="list" tag="p">
+                        <div v-for="o in this.exitquery" v-bind:key="o">
+                                <el-card  class = "exitprocess" shadow="always"  @click.native="showdetail(o)">Id:{{o.id}} </el-card>
                         </div>
+                        </transition-group>
                     </div>  
             </div>
             <div class="contain-right">
@@ -75,9 +83,9 @@
                         
                             <el-form :label-position='right'>
                                 <el-form-item >
-                                    <div class="block">
+                                    <div class="priority" v-if="readylevel!=1">
                                         <span class="demonstration">优先级</span>
-                                        <el-slider v-model="pcb.priority" :step="1" show-stops :min="1" :max="4"></el-slider>
+                                        <el-slider v-model="pcb.priority" :step="1" show-stops :min="1" :max="readylevel"></el-slider>
                                       </div>
                                 </el-form-item>
                                 <el-form-item label="" prop="region">
@@ -118,14 +126,15 @@
                                 </el-form-item>
                                 
                             </el-form>
-                            <button class="btn btn-primary" v-if="beginstate == false" v-on:click="begin()">开始</button>
-                            <button class="btn btn-primary" v-if="beginstate == true" v-on:click="pause()">暂停</button>
+                            <button class="runbutton btn btn-primary" v-if="beginstate == false" v-on:click="begin()">开始</button>
+                            <button class="runbutton btn btn-primary" v-if="beginstate == true" v-on:click="pause()">暂停</button>
                         </div>
             </div>
         </div> 
         <transition name="slide-fade">
-            <div class = "processinfo" v-show="clickpcb.isclick">
+            <div class = "processinfo" v-show="clickpcb.isclick" @mouseenter="enter" @mouseleave="leave">
                     <div>
+                        <h1>This is Process Id:{{clickpcb.id}}, I had run {{clickpcb.numberofruntime}} times</h1>
                         <el-steps :space="200" :active="clickpcb.state" finish-status="success">
                             <el-step title="创建"></el-step>
                             <el-step title="就绪"></el-step>
@@ -138,15 +147,31 @@
                         <button class="btn btn-primary" v-if="clickpcb.state == 3" @click="torecover(clickpcb)">恢复</button>
                 </div>
         </transition>
-
+        <div class="modifyconfigure">
+                <el-dialog title="配置" :visible.sync="dialogFormVisible" class="modifyconfigure-alert">
+                        <div style="display: flex;flex-direction: column; align-items: center">
+                                <div>创建队列大小<el-input-number v-model="newquerysize"  :min="1" :max="10" label="创建队列大小" ></el-input-number></div>
+                                <div>阻塞队列大小<el-input-number v-model="blockquerysize"  :min="1" :max="10" label="阻塞队列大小"></el-input-number></div>
+                                <div>就绪队列大小<el-input-number v-model="readyquerysize" @change="handleChange" :min="1" :max="7" label="就绪队列大小"></el-input-number></div>
+                                <div>优先级的数量<el-input-number v-model="readylevel" @change="modifypriority" :min="1" :max="8" label="优先级的数量"></el-input-number></div>
+                        </div>
+                        <div v-for="(item,index) in timeslice">
+                            <div ><div>优先级{{index}}时间片大小</div><el-slider v-model="timeslice[index]" show-stops :min="100" :max="1000" show-input></el-slider></div>
+                        </div>
+                        <div slot="footer" class="dialog-footer">
+                          <el-button @click="dialogFormVisible = false">取 消</el-button>
+                          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                        </div>
+                      </el-dialog>
+        </div>
     </div>
-</transition>
 </body>
 <script>
     	var app = new Vue({
 		el: '#app',
 		data: function (){
            return  {
+            dialogFormVisible: true,
             nowpriority:1,
             newquery:[],
             runquery:[],
@@ -156,7 +181,6 @@
             memory : 10000,
             readylevel: 4,//一共多少个优先级
             readyquerysize : 4,
-            everyreadyquerysize :4,
             newquerysize : 4,
             blockquerysize : 4,
             runquerysize : 1,
@@ -172,6 +196,7 @@
                 blocktime:1000,
                 blocklasttime:1000,
                 runtime:1000,
+                numberofruntime:0,
                 priority:1,
                 state:0,
             },
@@ -183,6 +208,7 @@
                 blocktime:1000,
                 blocklasttime:1000,
                 runtime:1000,
+                numberofruntime:0,
                 priority:1,
                 state:0,
                 clickprocessstate:0,
@@ -190,6 +216,7 @@
             },
             beginstate:false,
             beginid:0,
+            ishover:false,
         }
         },
         methods:{
@@ -208,13 +235,23 @@
                 console.log(nowprocess)
                 this.clickpcb.isclick = true
                 this.clickpcb.state = nowprocess.state
+                this.clickpcb.id = nowprocess.id
+                this.clickpcb.numberofruntime = nowprocess.numberofruntime
+                // this.ishover = setTimeout(function (){
+                //     app.clickpcb.isclick=false
+                // },2000)
+            },
+            enter: function(){
+                clearTimeout(this.ishover);
+            },
+            leave: function(){
                 setTimeout(function (){
                     app.clickpcb.isclick=false
                 },2000)
             },
             run:function(){
                 //处理阻塞队列
-                let obj1 = disposeblockquery(this.blockquery,this.readyquery,this.readyquerysize,this.exitquery,this.timeslice)
+                let obj1 = disposeblockquery(this.blockquery,this.readyquery,this.readyquerysize,this.exitquery,this.timeslice,this.blockquerysize)
                 this.blockquery = obj1.blockquery
                 this.readyquery = obj1.readyquery
                 this.exitquery = obj1.exitquery
@@ -247,10 +284,26 @@
             toblock:function(clickpcb){
                 try {
                     if(clickpcb.state == 1){
+                        //就绪队列
+                        for(let i = 0;i<this.readyquerysize;i++){
+                            if(this.readyquery[clickpcb.priority-1].id == clickpcb.id){
+                                this.readyquery[clickpcb.priority-1].isblock = true;
+                                this.readyquery[clickpcb.priority-1].blocktime = 0;
+                                this.readyquery[clickpcb.priority-1].blocklasttime = 3000;
+                            }
+                        }
                     }
                     if(clickpcb.state == 2){
-                        runquery[0].isblock = true;
-                        runquery[0].blocktime = 0;
+
+                        if(this.blockquery.length<this.blockquerysize){
+                            this.runquery[0].isblock = true
+                            this.runquery[0].blocktime = 0
+                            this.runquery[0].blocklasttime = 3000
+                            this.blockquery.push(runquery.pop)
+                        }
+                        else{
+                            alert("失败，阻塞队列不够大，请等待")
+                        }
                     }
                 } catch (error) {
                     
@@ -258,10 +311,39 @@
             },
             torecover:function(clickpcb){
                 try {
-                    
+                    for(let i = 0;i<this.blockquerysize;i++){
+                        if(this.blockquery.id == clickpcb.id){
+                            this.readyquery.isblock = false;
+                            this.readyquery.blocktime = 1000;
+                            this.readyquery.blocklasttime = 3000;
+                        }
+                    }
                 } catch (error) {
                 }
             },
+            modifypriority:function(){
+                let tempreadyquery = []
+                let temptimeslice = []
+                for(let i = 0;i < this.readylevel;i++){
+                    tempreadyquery.push([])
+                    temptimeslice.push(500)
+                }
+                this.readyquery = tempreadyquery
+                this.timeslice = temptimeslice
+            },
+        },
+        beforeCreate: function () {
+            this.$nextTick(function () {
+                const loading = this.$loading({
+                lock: true,
+                text: '模拟操作系统Loading',
+                spinner: '',
+                background: 'rgba(255, 255, 255, 0.7)'
+                });
+                setTimeout(() => {
+                loading.close();
+                }, 2000);
+            })
         }
 	})
     </script>
@@ -438,6 +520,8 @@
         margin-left: 3%;
         height: 80%;
         background-color: chartreuse;
+        display: flex;
+        flex-direction: row;
     }
     .exitquery-title{
        font-size: 20px;
@@ -480,7 +564,7 @@
   /* 可以设置不同的进入和离开动画 */
 /* 设置持续时间和动画函数 */
 .slide-fade-enter-active {
-  transition: all .3s ease;
+  transition: all .5s ease;
 }
 .slide-fade-leave-active {
   transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
@@ -489,6 +573,29 @@
 /* .slide-fade-leave-active for below version 2.1.8 */ {
   transform: translateX(10px);
   opacity: 0;
+}
+.list-item {
+  display: inherit;
+  margin-right: 10px;
+}
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to
+/* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.runbutton{
+    margin-left: 10%;
+    margin-top: 3%;
+    width: 88%;
+    height: 15%;
+    font-size:150%;
+}
+.modifyconfigure >.modifyconfigure-alert{
+    display: flex;
+    flex-direction: column;
 }
   </style>
 </html>
