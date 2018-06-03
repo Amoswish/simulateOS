@@ -52,3 +52,19 @@
 
 （3）	被调度上的进程PCB内容。 
 	当进程状态切换时，输出：当前就绪队列、运行队列和阻塞队列中各进程的标识。
+---
+
+## loading 界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/load.jpg?raw=true)
+
+## config 界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/config.jpg?raw=true)
+
+## 创建进程界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/create.jpg?raw=true)
+## 创建进程队列已满界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/createqueuefull.jpg?raw=true)
+## 运行界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/run.jpg?raw=true)
+## 结束界面
+ ![image](https://github.com/Amoswish/simulateOS/blob/master/sim-picture/finish.jpg?raw=true)
